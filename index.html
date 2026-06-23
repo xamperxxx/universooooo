@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Universo de Amor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- PANTALLA DE INICIO -->
+    <div id="start-screen" class="start-screen">
+        <div class="start-content">
+            <div class="floating-hearts">
+                <span class="heart-float" style="--delay:0s;--x:20%;--size:14px;">💗</span>
+                <span class="heart-float" style="--delay:1.2s;--x:80%;--size:18px;">💖</span>
+                <span class="heart-float" style="--delay:2.5s;--x:10%;--size:12px;">💕</span>
+                <span class="heart-float" style="--delay:0.8s;--x:90%;--size:16px;">💘</span>
+                <span class="heart-float" style="--delay:3.1s;--x:35%;--size:10px;">💝</span>
+                <span class="heart-float" style="--delay:1.8s;--x:65%;--size:20px;">💗</span>
+                <span class="heart-float" style="--delay:4s;--x:50%;--size:13px;">💖</span>
+            </div>
+            
+            <h1 class="glow-title">
+                <span class="title-line">I LOVE YOU</span>
+                <span class="title-sub">Para Siempre</span>
+            </h1>
+            
+            <div class="start-illustration">
+                <div class="cats-container">
+                    <span class="cat-left">🐱</span>
+                    <div class="heart-center">
+                        <span class="heart-main">❤️</span>
+                        <div class="heart-pulse-ring"></div>
+                    </div>
+                    <span class="cat-right">🐱</span>
+                </div>
+            </div>
+            
+            <p class="start-subtitle">Haz clic para iniciar</p>
+            
+            <div class="message-box">
+                <p class="love-message">"Eres mi estrella favorita en este universo infinito. Cada latido de mi corazón lleva tu nombre escrito."</p>
+            </div>
+            
+            <button id="start-btn" class="start-btn">
+                <span class="btn-text">INICIAR</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div id="main-content" class="main-content hidden">
+        <div id="scene-container">
+            <canvas id="galaxy-canvas"></canvas>
+            <div id="planets-container"></div>
+        </div>
+        
+        <div class="zoom-controls">
+            <button id="zoom-in" class="zoom-btn">+</button>
+            <button id="zoom-out" class="zoom-btn">−</button>
+            <button id="zoom-reset" class="zoom-btn">⟲</button>
+        </div>
+        
+        <div class="instructions">
+            🖱️ Rueda: Zoom | Arrastrar: Mover
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-image">
+                <img id="modal-img" src="" alt="Planeta">
+            </div>
+            <h2 id="modal-title" class="modal-title"></h2>
+            <p id="modal-message" class="modal-message"></p>
+            <button id="close-modal" class="close-btn">CERRAR ✦</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

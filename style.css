@@ -1,0 +1,906 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow: hidden;
+    background: radial-gradient(ellipse at center, #0a0015 0%, #04000d 60%, #000005 100%);
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    width: 100vw;
+    height: 100vh;
+    user-select: none;
+}
+
+/* ==================== PANTALLA DE INICIO ==================== */
+.start-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, #1a0a2e 0%, #0d0221 55%, #07010f 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 1.5s ease, visibility 1.5s ease;
+}
+
+.start-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.start-content {
+    text-align: center;
+    animation: fadeInUp 1s ease;
+}
+
+.glow-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: 5rem;
+    color: #fff;
+    text-shadow: 
+        0 0 10px rgba(255, 105, 180, 0.8),
+        0 0 30px rgba(255, 105, 180, 0.6),
+        0 0 60px rgba(255, 20, 147, 0.4),
+        0 0 100px rgba(255, 20, 147, 0.2);
+    margin-bottom: 15px;
+    animation: pulseGlow 2.5s ease-in-out infinite;
+}
+
+.bear-hug {
+    font-size: 6rem;
+    display: block;
+    margin: 15px 0;
+    animation: float 3s ease-in-out infinite;
+}
+
+.start-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 25px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.start-btn {
+    padding: 14px 50px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: white;
+    background: linear-gradient(45deg, #ff1493, #ff69b4);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 
+        0 0 20px rgba(255, 20, 147, 0.5),
+        0 0 50px rgba(255, 20, 147, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.start-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 
+        0 0 30px rgba(255, 20, 147, 0.7),
+        0 0 70px rgba(255, 20, 147, 0.4);
+}
+
+.start-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.15), transparent);
+    transform: rotate(45deg);
+    animation: shimmer 3s infinite;
+}
+
+/* ==================== CONTENIDO PRINCIPAL ==================== */
+.main-content {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 2s ease;
+    cursor: default;
+}
+
+.main-content:active {
+    cursor: default;
+}
+
+.main-content.visible {
+    opacity: 1;
+}
+
+.main-content.hidden {
+    display: none;
+}
+
+#scene-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform-origin: center center;
+    transition: transform 0.1s ease-out;
+}
+
+#galaxy-canvas {
+    position: absolute;
+    top: -50vh;
+    left: -50vw;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+}
+
+/* ==================== PLANETAS CON TEXTO AL COSTADO ==================== */
+#planets-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.planet-wrapper {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    pointer-events: none;
+    /* Sin transition aquí — la manejamos con JS para órbita */
+}
+
+.planet-wrapper.left-side {
+    flex-direction: row-reverse;
+}
+
+/* ---- Imagen del planeta ---- */
+.planet-wrapper .planet-img {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    cursor: pointer;
+    pointer-events: all;
+    flex-shrink: 0;
+    opacity: 0;
+    transform: scale(0) rotate(-180deg);
+    transition: opacity 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+                transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+}
+
+/* Anillo exterior brillante */
+.planet-wrapper .planet-img::before {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    background: conic-gradient(
+        from 0deg,
+        rgba(255, 20, 147, 0.8),
+        rgba(255, 182, 193, 0.3),
+        rgba(255, 20, 147, 0.8)
+    );
+    animation: spinRing 4s linear infinite;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.planet-wrapper .planet-img:hover::before {
+    opacity: 1;
+}
+
+.planet-wrapper .planet-img.visible {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+}
+
+.planet-wrapper .planet-img:hover {
+    transform: scale(1.35) !important;
+    filter: drop-shadow(0 0 22px rgba(255, 105, 180, 1));
+}
+
+.planet-wrapper .planet-img img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2.5px solid rgba(255, 105, 180, 0.7);
+    box-shadow: 
+        0 0 18px rgba(255, 105, 180, 0.6),
+        0 0 35px rgba(255, 20, 147, 0.3),
+        inset 0 0 18px rgba(255, 182, 193, 0.15);
+    background: radial-gradient(circle, rgba(255,182,193,0.3), transparent);
+    display: block;
+}
+
+/* ---- Label del planeta ---- */
+.planet-wrapper .planet-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    color: rgba(255, 200, 220, 0.95);
+    text-shadow: 
+        0 0 8px rgba(255, 105, 180, 0.9),
+        0 0 16px rgba(255, 20, 147, 0.6),
+        0 0 30px rgba(255, 20, 147, 0.3);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(-14px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    text-transform: uppercase;
+}
+
+.planet-wrapper.left-side .planet-label {
+    transform: translateX(14px);
+}
+
+.planet-wrapper .planet-label.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ==================== CONTROLES ==================== */
+.zoom-controls {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 100;
+}
+
+.zoom-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 105, 180, 0.5);
+    background: rgba(0, 0, 0, 0.7);
+    color: #ff69b4;
+    font-size: 1.3rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+}
+
+.zoom-btn:hover {
+    background: rgba(255, 105, 180, 0.2);
+    border-color: #ff69b4;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
+}
+
+.instructions {
+    position: fixed;
+    bottom: 25px;
+    left: 25px;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.3);
+    z-index: 100;
+    letter-spacing: 1px;
+}
+
+/* ==================== MODAL ==================== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.modal:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+.modal.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+}
+
+.modal-content {
+    position: relative;
+    background: linear-gradient(135deg, rgba(26, 10, 46, 0.97), rgba(13, 2, 33, 0.97));
+    border: 1px solid rgba(255, 105, 180, 0.35);
+    border-radius: 28px;
+    padding: 38px;
+    text-align: center;
+    max-width: 420px;
+    width: 88%;
+    box-shadow: 
+        0 0 60px rgba(255, 20, 147, 0.28),
+        0 0 120px rgba(255, 20, 147, 0.12),
+        inset 0 0 40px rgba(255, 20, 147, 0.04);
+    animation: modalAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 10;
+}
+
+.modal-image {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid rgba(255, 105, 180, 0.6);
+    box-shadow: 
+        0 0 35px rgba(255, 105, 180, 0.5),
+        0 0 70px rgba(255, 20, 147, 0.25);
+}
+
+.modal-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.6rem;
+    color: #ffb6c1;
+    margin-bottom: 14px;
+    text-shadow: 0 0 25px rgba(255, 105, 180, 0.7);
+}
+
+.modal-message {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: rgba(255, 255, 255, 0.92);
+    margin-bottom: 24px;
+    font-weight: 300;
+}
+
+.close-btn {
+    padding: 11px 32px;
+    font-size: 0.85rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: white;
+    background: transparent;
+    border: 1.5px solid rgba(255, 105, 180, 0.45);
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+    background: rgba(255, 105, 180, 0.18);
+    border-color: #ff69b4;
+    box-shadow: 0 0 22px rgba(255, 105, 180, 0.4);
+}
+
+/* ==================== ANIMACIONES ==================== */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { 
+        text-shadow: 
+            0 0 10px rgba(255, 105, 180, 0.8),
+            0 0 30px rgba(255, 105, 180, 0.5),
+            0 0 60px rgba(255, 20, 147, 0.3);
+    }
+    50% { 
+        text-shadow: 
+            0 0 20px rgba(255, 105, 180, 1),
+            0 0 50px rgba(255, 105, 180, 0.8),
+            0 0 100px rgba(255, 20, 147, 0.5),
+            0 0 160px rgba(255, 20, 147, 0.3);
+    }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+
+@keyframes modalAppear {
+    from { opacity: 0; transform: scale(0.7) translateY(30px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes pulseRing {
+    0%, 100% { 
+        box-shadow: 
+            0 0 28px rgba(255, 105, 180, 0.45),
+            0 0 55px rgba(255, 20, 147, 0.22);
+    }
+    50% { 
+        box-shadow: 
+            0 0 40px rgba(255, 105, 180, 0.7),
+            0 0 80px rgba(255, 20, 147, 0.45),
+            0 0 110px rgba(255, 20, 147, 0.2);
+    }
+}
+
+@keyframes spinRing {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+    .glow-title { font-size: 3.5rem; }
+    .planet-wrapper .planet-img { width: 52px; height: 52px; }
+    .planet-wrapper .planet-label { font-size: 0.6rem; letter-spacing: 1px; }
+    .modal-content { padding: 25px; }
+    .modal-title { font-size: 2rem; }
+    .zoom-controls { bottom: 15px; right: 15px; }
+    .instructions { display: none; }
+}
+/* ═══════════════════════════════════════════════════════════
+   MEJORAS PANTALLA DE INICIO — FONDO PERSONALIZADO, GATITOS, MENSAJE
+   ═══════════════════════════════════════════════════════════ */
+
+/* ---- Fondo personalizado fondoestelar.png ---- */
+.start-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(ellipse at center, rgba(26, 10, 46, 0.4) 0%, rgba(13, 2, 33, 0.7) 55%, rgba(7, 1, 15, 0.9) 100%),
+        url('fondoestelar.png') center/cover no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 1.5s ease, visibility 1.5s ease;
+}
+
+/* ---- Corazones flotando de fondo ---- */
+.floating-hearts {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.heart-float {
+    position: absolute;
+    bottom: -30px;
+    left: var(--x);
+    font-size: var(--size);
+    opacity: 0;
+    animation: floatUp 6s ease-in-out infinite;
+    animation-delay: var(--delay);
+    filter: drop-shadow(0 0 8px rgba(255, 20, 147, 0.6));
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) scale(0.5) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 0.6;
+        transform: translateY(-50vh) scale(1) rotate(10deg);
+    }
+    90% {
+        opacity: 0.3;
+    }
+    100% {
+        transform: translateY(-110vh) scale(0.3) rotate(-10deg);
+        opacity: 0;
+    }
+}
+
+/* ---- Título mejorado con doble línea ---- */
+.glow-title {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 5px;
+}
+
+.title-line {
+    font-family: 'Dancing Script', cursive;
+    font-size: 5.5rem;
+    color: #fff;
+    text-shadow: 
+        0 0 10px rgba(255, 105, 180, 0.9),
+        0 0 30px rgba(255, 105, 180, 0.7),
+        0 0 60px rgba(255, 20, 147, 0.5),
+        0 0 100px rgba(255, 20, 147, 0.3),
+        0 0 150px rgba(255, 20, 147, 0.15);
+    animation: pulseGlow 2.5s ease-in-out infinite;
+    line-height: 1;
+}
+
+.title-sub {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 300;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    color: rgba(255, 182, 193, 0.85);
+    text-shadow: 
+        0 0 10px rgba(255, 105, 180, 0.5),
+        0 0 25px rgba(255, 20, 147, 0.3);
+    animation: fadeInSub 3s ease-in-out infinite alternate;
+}
+
+@keyframes fadeInSub {
+    0% { opacity: 0.6; letter-spacing: 8px; }
+    100% { opacity: 1; letter-spacing: 12px; }
+}
+
+/* ---- Contenedor de gatitos centrado ---- */
+.start-illustration {
+    margin: 15px 0 10px;
+}
+
+.cats-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Ambos gatitos iguales, sin emoji negro */
+.cat-left, .cat-right {
+    font-size: 4.5rem;
+    display: inline-block;
+    animation: catBounce 2.5s ease-in-out infinite;
+    filter: drop-shadow(0 0 15px rgba(255, 105, 180, 0.4));
+}
+
+.cat-left { animation-delay: 0s; }
+.cat-right { animation-delay: 0.4s; }
+
+@keyframes catBounce {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    25% { transform: translateY(-10px) rotate(3deg); }
+    50% { transform: translateY(-4px) rotate(-2deg); }
+    75% { transform: translateY(-8px) rotate(4deg); }
+}
+
+/* ---- Corazón central con anillo de pulso ---- */
+.heart-center {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 70px;
+}
+
+.heart-main {
+    font-size: 4rem;
+    display: inline-block;
+    animation: heartBeat 1.2s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(255, 20, 147, 0.8));
+    z-index: 2;
+    position: relative;
+}
+
+@keyframes heartBeat {
+    0%, 100% { transform: scale(1); }
+    14% { transform: scale(1.15); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.15); }
+    70% { transform: scale(1); }
+}
+
+.heart-pulse-ring {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 105, 180, 0.4);
+    animation: pulseRing 2s ease-out infinite;
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.heart-pulse-ring::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 182, 193, 0.3);
+    animation: pulseRing 2s ease-out infinite 0.5s;
+}
+
+@keyframes pulseRing {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2.2);
+        opacity: 0;
+    }
+}
+
+/* ---- Subtítulo ---- */
+.start-subtitle {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 8px 0 15px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+}
+
+/* ---- Caja de mensaje romántico ---- */
+.message-box {
+    max-width: 420px;
+    margin: 0 auto 22px;
+    padding: 18px 28px;
+    background: rgba(255, 20, 147, 0.06);
+    border: 1px solid rgba(255, 105, 180, 0.2);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 1;
+    animation: fadeInUp 1.2s ease 0.5s both;
+}
+
+.love-message {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.15rem;
+    color: rgba(255, 220, 230, 0.9);
+    line-height: 1.6;
+    text-align: center;
+    text-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
+    font-style: italic;
+}
+
+.message-box::before,
+.message-box::after {
+    content: '✦';
+    position: absolute;
+    color: rgba(255, 105, 180, 0.4);
+    font-size: 0.8rem;
+}
+
+.message-box::before {
+    top: 8px;
+    left: 12px;
+}
+
+.message-box::after {
+    bottom: 8px;
+    right: 12px;
+}
+
+/* ---- Botón mejorado ---- */
+.start-btn {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 60px;
+    min-width: 230px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    letter-spacing: 4px;
+    color: white;
+    background: linear-gradient(135deg, #ff1493, #ff69b4, #ff1493);
+    background-size: 200% 200%;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 
+        0 0 25px rgba(255, 20, 147, 0.5),
+        0 0 60px rgba(255, 20, 147, 0.2),
+        inset 0 0 20px rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    animation: gradientShift 3s ease infinite, btnFloat 3s ease-in-out infinite;
+    overflow: hidden;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes btnFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+.start-btn:hover {
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 
+        0 0 35px rgba(255, 20, 147, 0.7),
+        0 0 80px rgba(255, 20, 147, 0.4),
+        inset 0 0 30px rgba(255, 255, 255, 0.15);
+}
+
+.start-btn:active {
+    transform: scale(0.97);
+}
+
+.btn-icon {
+    font-size: 1.1rem;
+    animation: iconSpin 4s linear infinite;
+    display: inline-block;
+}
+
+@keyframes iconSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ---- Efecto de nebulosa sutil ---- */
+.start-content {
+    text-align: center;
+    animation: fadeInUp 1s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.start-content::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    right: -50px;
+    bottom: -50px;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(255, 20, 147, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 105, 180, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255, 182, 193, 0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+    animation: nebulaShift 8s ease-in-out infinite alternate;
+}
+
+@keyframes nebulaShift {
+    0% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+    100% { transform: scale(1.1) rotate(3deg); opacity: 1; }
+}
+
+/* ---- Responsive mejorado ---- */
+@media (max-width: 768px) {
+    .title-line { font-size: 3.8rem; }
+    .title-sub { font-size: 0.8rem; letter-spacing: 6px; }
+    .cat-left, .cat-right { font-size: 3.2rem; }
+    .heart-main { font-size: 2.8rem; }
+    .heart-center { width: 55px; height: 55px; }
+    .heart-pulse-ring { width: 55px; height: 55px; }
+    .message-box { max-width: 90%; padding: 14px 20px; }
+    .love-message { font-size: 1rem; }
+    .start-btn { padding: 12px 40px; font-size: 0.9rem; }
+    .start-subtitle { font-size: 0.75rem; }
+}
+
+@media (max-width: 480px) {
+    .start-screen, .main-content {
+        padding: 0 16px;
+    }
+
+    .start-content {
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    .title-line { font-size: 3.2rem; }
+    .title-sub { font-size: 0.75rem; letter-spacing: 4px; }
+    .start-subtitle { font-size: 0.7rem; letter-spacing: 3px; }
+
+    .cats-container {
+        gap: 8px;
+        padding: 0 5px;
+    }
+
+    .cat-left, .cat-right { font-size: 2.5rem; }
+    .heart-main { font-size: 2.4rem; }
+    .heart-center { width: 48px; height: 48px; }
+    .heart-pulse-ring { width: 48px; height: 48px; }
+
+    .message-box { max-width: 100%; padding: 12px 16px; }
+    .love-message { font-size: 0.95rem; line-height: 1.6; }
+
+    .start-btn {
+        width: 100%;
+        min-width: auto;
+        padding: 14px 0;
+        font-size: 0.95rem;
+        letter-spacing: 3px;
+    }
+
+    .modal-content {
+        width: 95%;
+        max-width: 360px;
+        padding: 28px;
+    }
+
+    .modal-image {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 18px;
+    }
+
+    .modal-title { font-size: 2.2rem; }
+    .modal-message { font-size: 0.95rem; }
+
+    .close-btn {
+        width: 100%;
+        padding: 12px 0;
+    }
+}
